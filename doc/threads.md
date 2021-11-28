@@ -6,22 +6,20 @@ A thread can run a function in parallel to the rest of the program, and every pr
 
 The limits of the number of threads depends of the OS and the machine running the program, and knowing this library uses Windows native threads and UNIX `pthread` library, you can know more about this kind of limits looking the documentation of your OS threads.
 
+---
 
-- `Thread:`
+### Types
+
+- `Thread`
 
 	Thread type used by the library.
 	
-	
+---
 
+### Examples
 
-- `Thread createThread(void *(*function)(void*), void *arg):`
-
-	Create and start a thread that runs the given function.
-	The input function should be able to receive a `void*` value and return a `void*` value, and the `void *arg` value will be passed to that input function.
-
-	Example function that could be used as an argument:
+- Example function that could be used as an argument:
 	```c
-	
 	// Function to run in a thread
 	void* myFunction(void* arg) {
 		if (NULL == arg) {
@@ -39,16 +37,12 @@ The limits of the number of threads depends of the OS and the machine running th
 	
 		return ( (void*) newInt );
 	}
-	
 	```
 
-	Any casted value could be passed as `void *arg` if this value has the same or less size than `void*`, but is recommended to pass pointers instead of values.
+	&nbsp;
 
-	The return value of `createThread(...)` will be NULL in the case of error and a valid `Thread` value if the thread is created.
-
-	Example usage of the function:
+- Example usage of `createThread()`:
 	```c
-	
 	void* myFunction(void* arg);
 	int myValue = 123;
 	
@@ -58,36 +52,40 @@ The limits of the number of threads depends of the OS and the machine running th
 		printf("Error creating thread\n");
 	} else {
 		printf("Thread created successfully\n");
-	}
-	
+	}	
 	```
 
+	&nbsp;
 
-
-
-- `int joinAndDestroyThread(Thread *thread, void **retvalue):`
-
-	Waits to `*thread` to end, and writes the returning value to `**retvalue`. This function returns `0` if the thread is joined correctly and return other values otherwise.
-
-	In a successful case, the `*thread` value is set to `NULL` to let the user know there 
-
-	Example usage of the function:
+- Example usage of `joinAndDestroyThread()`:
 	```c
-	
-	//...
-	
-	Thread th = createThread(&myFunction, &myValue);
-	
-	//...
-	
 	int returnValue = 0;
 	if ( joinAndDestroyThread(&th, (void*) &returnValue) ) {
 		printf("Error joining the thread\n");
 	} else {
 		printf("Value returned from the thread: %d\n", returnValue);
 	}
-	
-	//...
-	
 	```
 
+
+---
+
+### Functions
+
+- `Thread createThread(void *(*function)(void*), void *arg)`
+
+	Create and start a thread that runs the given function.
+	The input function should be able to receive a `void*` value and return a `void*` value, and the `void *arg` value will be passed to that input function.
+
+	Any casted value could be passed as `void *arg` if this value has the same or less size than `void*`, but is recommended to pass pointers instead of values.
+
+	The return value of `createThread(...)` will be NULL in the case of error and a valid `Thread` value if the thread is created.
+
+	&nbsp;
+
+
+- `int joinAndDestroyThread(Thread *thread, void **retvalue)`
+
+	Waits to `*thread` to end, and writes the returning value to `**retvalue`. This function returns `0` if the thread is joined correctly and return other values otherwise.
+
+	In a successful case, the `*thread` value is set to `NULL` to let the user know there

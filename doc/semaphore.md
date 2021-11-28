@@ -4,13 +4,38 @@ An unnamed semaphore library for Windows and Unix.
 
 A semaphore is a synchronization tool that saves a positive integer value. When the value is zero and the threads are waiting to be non-zero, the threads will be waiting efficiently (will be using 0% of the CPU) until the semaphore change value.
 
+---
+
+### Types
 
 - `Semaphore`
 
 	Semaphore type used by the library.
 	
-	
+---
 
+### Examples
+
+Example of `createUnnamedSemaphore()`:
+```c
+	Semaphore mySem;
+
+	if ( createUnnamedSemaphore(&mySem, 3) ) {
+		printf("Error creating semaphore\n");
+	}
+```
+
+&nbsp;
+
+
+Example of `destroySemaphore()`:
+```c
+destroySemaphore(&mySem);
+```
+
+---
+
+### Functions
 
 - `int createUnnamedSemaphore(Semaphore *sem, const int maxValue)`
 
@@ -18,38 +43,14 @@ A semaphore is a synchronization tool that saves a positive integer value. When 
 
 	Returns `0` if is executed successfully, returns non-zero otherwise.
 
-	Example:
-	```c
-	
-	// ...
-	
-	Semaphore mySem;
-	if ( createUnnamedSemaphore(&mySem, 3) ) {
-		printf("Error creating semaphore\n");
-	}
-	
-	// ...
-	
-	```
-
-
+	&nbsp;
 
 
 - `void destroySemaphore(Semaphore *sem)`
 
 	Destroys a semaphore and set `*sem` to NULL.
 
-	Example:
-	```c
-	
-	Semaphore mySem;
-	
-	//...
-	
-	destroySemaphore(&mySem);
-
-	```
-
+	&nbsp;
 
 
 - `int incrementSemaphore(Semaphore sem)`
@@ -58,7 +59,7 @@ A semaphore is a synchronization tool that saves a positive integer value. When 
 
 	Returns `0` if is done successfully and non-zero otherwise.
 	
-	
+	&nbsp;
 
 
 - `int waitSemaphore(Semaphore sem)`
@@ -67,7 +68,7 @@ A semaphore is a synchronization tool that saves a positive integer value. When 
 
 	Returns `0` if is done successfully and non-zero otherwise.
 	
-	
+	&nbsp;
 
 
 - `int tryWaitSemaphore(Semaphore sem)`
