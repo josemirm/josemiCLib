@@ -13,29 +13,29 @@ extern "C" {
         typedef struct {
             CONDITION_VARIABLE  cv;
             CRITICAL_SECTION    cs;
-        } CondVar_st;
+        } Monitor_st;
 
-        typedef CondVar_st* CondVar;
+        typedef Monitor_st* Monitor;
     #endif
 
     #ifdef __UNIX_PLATFORM__
         typedef struct {
             pthread_cond_t  *cv;
             Mutex mutex;
-        } CondVar_st;
+        } Monitor_st;
 
-        typedef CondVar_st* CondVar;
+        typedef Monitor_st* Monitor;
     #endif
 
-    int createCondVar(CondVar *condVarPtr);
-    void destroyCondVar(CondVar *condVarPtr);
+    int createMonitor(Monitor *monPtr);
+    void destroyMonitor(Monitor *monPtr);
 
-    void enterCondVar(CondVar condVar);
-    void exitCondVar(CondVar condVar);
+    void enterMonitor(Monitor mon);
+    void exitMonitor(Monitor mon);
 
-    int sleepCondVar(CondVar condVar, Mutex mutex);
-    int wakeCondVar(CondVar condVar);
-    int wakeAllCondVar(CondVar condVar);
+    int sleepMonitor(Monitor mon);
+    int wakeMonitor(Monitor mon);
+    int wakeAllMonitor(Monitor mon);
 
 #ifdef __cplusplus
 }

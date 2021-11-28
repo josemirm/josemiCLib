@@ -5,19 +5,19 @@ Mutex createMutex() {
         HANDLE mutex = CreateMutex(NULL, FALSE, NULL);
 
         if (NULL == mutex) {
-            printWinError("Error creating mutex");
+            printWinError("createMutex: Error creating mutex");
         }
 
         return mutex;
     #elif __UNIX_PLATFORM__
         pthread_mutex_t *mtx = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
         if (NULL == mtx) {
-            perror("Error creating mutex");
+            perror("createMutex: Error creating mutex");
             return NULL;
         }
 
         if (pthread_mutex_init(mtx, NULL)) {
-            perror("Error creating mutex");
+            perror("createMutex: Error creating mutex");
             mtx = NULL;
         }
 
@@ -34,10 +34,13 @@ void destroyMutex(Mutex *mutex) {
     }
 
     #ifdef __WIN_PLATFORM__
-        CloseHandle(*mutex);
+        if (!CloseHandle(*mutex)) {
+            printWinError("destroyMutex: Error destroying mutex");
+            return;
+        }
     #elif __UNIX_PLATFORM__
         if (pthread_mutex_destroy(*mutex)) {
-            perror("Error destroying the thread");
+            perror("destroyMutex: Error destroying mutex");
             return;
         }
     #endif
@@ -49,24 +52,40 @@ void destroyMutex(Mutex *mutex) {
 int lockMutex(Mutex mutex) {
     #ifdef __WIN_PLATFORM__
         if ((DWORD) 0xFFFFFFFF == WaitForSingleObject(mutex, INFINITE)) {
+            printWinError("lockMutex: Error locking mutex");
             return -1;
         }
+
+        return 0;
     #elif __UNIX_PLATFORM__
         if (pthread_mutex_lock(mutex)) {
+            perror("lockMutex: Error locking mutex");
             return -1;
         }
+
+        return 0;
     #endif
 
-    return 0;
+    return -1;
 }
 
 
-void unlockMutex(Mutex mutex) {
+int unlockMutex(Mutex mutex) {
     #ifdef __WIN_PLATFORM__
-        ReleaseMutex(mutex);
+        if (!ReleaseMutex(mutex)) {
+            printWinError("unlockMutex: Error unlocking mutex");
+            return -1;
+        }
+
+        return 0;
     #elif __UNIX_PLATFORM__
         if (pthread_mutex_unlock(mutex)) {
-            perror("Error unlocking the thread");
+            perror("unlockMutex: Error unlocking mutex");
+            return -1;
         }
+
+        return 0;
     #endif
+
+    return -1;
 }

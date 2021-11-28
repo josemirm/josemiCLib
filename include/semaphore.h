@@ -24,7 +24,7 @@ extern "C" {
 
 
     // NOTE: Semaphore initial value is the max value configured
-    int createUnnamedSemaphore(Semaphore *sem, int value);
+    int createUnnamedSemaphore(Semaphore *sem, const int maxValue);
     void destroySemaphore(Semaphore *sem);
 
     int incrementSemaphore(Semaphore sem);

@@ -118,16 +118,16 @@ Fifo openFifo(char const* fifoName, bool readOnly) {
 }
 
 
-void destroyFifo(const Fifo fifo) {
-    if (NULL == fifo) {
+void destroyFifo(Fifo *fifo) {
+    if (NULL == *fifo || NULL == *fifo) {
         return;
     }
 
     #ifdef __WIN_PLATFORM__
-        if (fifo->created) {
-            destroyWinFifo(fifo->handle);
+        if ((*fifo)->created) {
+            destroyWinFifo((*fifo)->handle);
         } else {
-            closeWinFifo(fifo->handle);
+            closeWinFifo((*fifo)->handle);
         }
     #endif
 
@@ -139,8 +139,9 @@ void destroyFifo(const Fifo fifo) {
         }
     #endif
 
-    free(fifo->name);
-    free(fifo);
+    free((*fifo)->name);
+    free(*fifo);
+    *fifo = NULL;
 }
 
 

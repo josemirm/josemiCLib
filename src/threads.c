@@ -13,13 +13,14 @@ Thread createThread(void *(*function)(void*), void *arg) {
     }
 
     #ifdef __WIN_PLATFORM__
+        // CreateThread returns NULL on error
         return CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)function, arg, 0, NULL);
     #endif
 
     #ifdef __UNIX_PLATFORM__
         pthread_t *thread = (pthread_t *) calloc(1, sizeof(pthread_t));
 
-        if (!thread) {
+        if (NULL == thread) {
             printError("Error allocating memory\n");
             return NULL;
         }

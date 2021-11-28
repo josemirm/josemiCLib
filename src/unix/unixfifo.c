@@ -122,7 +122,7 @@ extern "C" {
         }
         
         unsigned int bytesWritten = 0;
-        bytesWritten = write(fd, data, size);
+        bytesWritten = write_n(fd, data, size);
 
         if (bytesWritten < 0) {
             perror("Error writing to the FIFO");

@@ -1,1 +1,0 @@
-add_library(josemiUtilsWindows winfifo.c winutils.c)

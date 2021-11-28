@@ -4,13 +4,13 @@
 
 #include "semaphore.h"
 
-int createUnnamedSemaphore(Semaphore *sem, int value) {
+int createUnnamedSemaphore(Semaphore *sem, const int maxValue) {
     if (NULL == sem) {
         return -1;
     }
 
     #ifdef __WIN_PLATFORM__
-        *sem = CreateSemaphore(NULL, value, value, NULL);
+        *sem = CreateSemaphore(NULL, maxValue, maxValue, NULL);
         if (NULL == *sem) {
             printWinError("Error creating unnamed semaphore");
             return -1;
@@ -104,6 +104,12 @@ int tryWaitSemaphore(Semaphore sem) {
             printWinError("Error waiting semaphore");
             return -1;
         } else {
+            // After decrementing, increments again to let it unchanged
+            if (FALSE == ReleaseSemaphore(sem, 1, NULL)) {
+                printWinError("Error incrementing semaphore");
+                return -1;
+            }
+
             return 0;
         }
     #endif

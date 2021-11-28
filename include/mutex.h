@@ -26,7 +26,7 @@ extern "C" {
     Mutex createMutex();
     void destroyMutex(Mutex *mutex);
     int lockMutex(Mutex mutex);
-    void unlockMutex(Mutex mutex);
+    int unlockMutex(Mutex mutex);
 
 #ifdef __cplusplus
 }
