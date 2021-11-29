@@ -38,7 +38,7 @@ Fifo createFifo(char const* fifoName, enum FifoDataType dataType, bool nonBlocki
         }
 
         fifo->handle = createWinFifo(fifo->name, FIFO_IN_OUT, wfdt, wfrm, wfwm);
-        if (INVALID_HANDLE_VALUE == fifo->handle) {
+        if (NULL == fifo->handle) {
             free(fifo->name);
             free(fifo);
             return NULL;
@@ -86,7 +86,7 @@ Fifo openFifo(char const* fifoName, bool readOnly) {
         }
 
         fifo->handle = openWinFifo(fifo->name, readOnly);
-        if (INVALID_HANDLE_VALUE == fifo->handle) {
+        if (NULL == fifo->handle) {
             free(fifo->name);
             free(fifo);
             return NULL;

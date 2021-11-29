@@ -39,7 +39,6 @@
 
 			memcpy(ret, WIN_FIFO_PREFIX, strlen(WIN_FIFO_PREFIX));
 			memcpy(ret + prefLen, name, strlen(name));
-			ret[len] = '\0';
 		} else {
 			len = strlen(name) + 1;
 			ret = malloc(len);
@@ -49,8 +48,9 @@
 			}
 
 			memcpy(ret, name, len-1);
-			ret[len] = '\0';
 		}
+
+		ret[len-1] = '\0';
 
 		return ret;
 	}
@@ -78,6 +78,7 @@
 
 		if (INVALID_HANDLE_VALUE == ret) {
 			printWinError("createWinFifo: CreateNamedPipeA failed");
+			return NULL;
 		}
 
 		return ret;
@@ -131,7 +132,7 @@
 		// Waits to other process to create the pipe
 		if (0 == WaitNamedPipeA(name, FIFO_TIMEOUT_MS)) {
 			printWinError("openWinFifo: Error waiting the named pipe");
-			return INVALID_HANDLE_VALUE;
+			return NULL;
 		}
 		
 		DWORD access = GENERIC_READ;
@@ -149,6 +150,7 @@
 		// Checks if there is any error
 		if (INVALID_HANDLE_VALUE == ret) {
 			printWinError("openWinFifo: Error opening the named pipe");
+			return NULL;
 		}
 
 		return ret;

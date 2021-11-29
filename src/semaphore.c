@@ -32,7 +32,7 @@ int createUnnamedSemaphore(Semaphore *sem, const int maxValue) {
 
 
 void destroySemaphore(Semaphore *sem) {
-    if (NULL == sem) {
+    if (NULL == sem || NULL == *sem) {
         return;
     }
 
