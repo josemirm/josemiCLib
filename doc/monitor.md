@@ -14,9 +14,9 @@ The same monitor must be used between all the threads using the same shared reso
 created like this:
 
 ```c
-Monitor monitor;
+Monitor mon;
 
-if ( createMonitor(&monitor) ) {
+if (createMonitor(&mon)) {
     printf("Error creating monitor\n");
     // do something more
 }
@@ -25,50 +25,51 @@ if ( createMonitor(&monitor) ) {
 And should be destroyed simply like this:
 
 ```c
-destroyMonitor(&monitor);
+destroyMonitor(&mon);
 ```
 
 
-When there is any usage of the shared resources and a waiting condition, it must be used `enterMonitor()` before, and `exitMonitor()` after. That means that `sleepMonitor()` funtion must be used between the execution of those two functions.
+When there is any usage of the shared resources and a waiting condition, it must be used `exitMonitor()` after executing `waitAndEnterMonitor()` and any necessary process done in any shared value.
 
 Wake functions (`wakeMonitor()` and `wakeAllMonitor()`) should be executed after changing the shared resource, and that means, after the execution of `exitMonitor()`.
 
 
 &nbsp; 
 
-- Consumer or 'conditionally blocked' thread:
+- Conditionally blocked thread:
 
 ```c
-enterMonitor(monitor);
+// Monitor mon is created previously
 
+// Check if the condition is achieved, and it isn't, it sleeps until some
+// changes are made and the monitor "mon" is signaled to wake the thread.
 
-// Check if the condition is achieved, and it isn't, it sleeps until some changes are made and the
-// monitor is signaled to wake the thread. After every wake, it will check the condition and it will
-// only continue its execution when its condition is made
+// After every wake, it will check the condition and it will only continue its
+// execution when its condition is made.
+
+// This wait won't have any timeout.
 while (someTriggerValue < sharedResource.value) {
-    sleepMonitor(mon);
+    waitAndEnterMonitor(mon, 0);
 }
 
 doSomething(sharedResource.Value);
 
-exitMonitor(monitor)
+exitMonitor(mon)
 ```
 
 &nbsp; 
 
-- Producer or 'waker' thread:
- ```c
-enterMonitor(monitor);
+- Waiting thread:
+```c
+// The monitor blocks the thread until other thread wakes it. If it's not
+// awakeded in 5000 milliseconds, it will wake itself after that time.
+waitAndEnterMonitor(mon, 5000);
 
-// Change the value
-sharedResource.value = giveNewValue();
+doSomething();
 
-exitMonitor(monitor);
+exitMonitor(mon);
 
-
-// Notify waiting threads
-wakeMonitor(mointor);
- ```
+```
 
 ---
 
@@ -90,9 +91,9 @@ wakeMonitor(mointor);
 
     &nbsp;
 
-- `void destroyMonitor(Monitor *monPtr)`
+- `void destroyMonitor(Monitor* monPtr)`
 
-    Destroy the monitor and set the `*monPtr` value to `NULL`.
+    Destroy the monitor and set the value that `monPtr` points to `NULL`.
 
     &nbsp;
 
@@ -110,9 +111,10 @@ wakeMonitor(mointor);
     &nbsp;
 
 
-- `int sleepMonitor(Monitor mon)`
+- `int waitAndEnterMonitor(Monitor mon)`
 
     Blocks the thread and waits until other thread wake it using the same monitor.
+    It isn't necessary to execute `enterMonitor()` before this function.
 
     Returns `0` when executes successfully or returns non-zero otherwise.
 

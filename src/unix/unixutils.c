@@ -1,4 +1,7 @@
-#include "unixutils.h"
+// unixutils.c
+// José Miguel Rodríguez Marchena (@josemirm)
+
+#include "../../include/unix/unixutils.h"
 
 #ifdef __UNIX_PLATFORM__
 
@@ -14,7 +17,7 @@ ssize_t write_n(const int fd, const void* buffer, const size_t count) {
 			totalWritten += written;
 		}
 		else {
-			// if Written == -1 some error happened 
+			// if Written == -1 some error happened
 
 			if (errno == EINTR) {
 				// If the process was interrupted in the middle of the writting, ir should continue
@@ -30,7 +33,6 @@ ssize_t write_n(const int fd, const void* buffer, const size_t count) {
 
 	return totalWritten;
 }
-
 ssize_t read_n(const int fd, void* buffer, const size_t count) {
 	char* cbuffer = (char*)buffer;
 	size_t totalRead = 0;
@@ -49,7 +51,7 @@ ssize_t read_n(const int fd, void* buffer, const size_t count) {
 			totalRead += readBytes;
 		}
 		else {
-			// if read == -1 some error happened 
+			// if read == -1 some error happened
 
 			if (errno == EINTR) {
 				// If the process was interrupted in the middle of the reading, ir should continue

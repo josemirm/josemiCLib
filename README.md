@@ -7,7 +7,7 @@ The wrappers are OS agnostic between Unix and Windows, and they use OS specific 
 
 This library can be used including the `include` and `src` folders in your project and compiling all together.
 
-It could also link a precompiled static library file after using CMake, and a `CMakeLists.txt` file is provided to make this task easier.
+It could also link a pre-compiled static library file after using CMake, and a `CMakeLists.txt` file is provided to make this task easier.
 
 ### Documentation
 
@@ -15,10 +15,16 @@ All the documentation for the library is available in Markdown format in the doc
 
 - [fifo.md: FIFO interprocess communication library](doc/fifo.md)
 - [monitor.md: Monitor library](doc/monitor.md)
-- [mutex.md: Mutex librery](doc/mutex.md)
+- [mutex.md: Mutex library](doc/mutex.md)
 - [semaphore.md: Semaphore library](doc/semaphore.md)
 - [threads.md: Thread library](doc/threads.md)
 - [util.md: Common utility functions](doc/util.md)
+
+If you want to use the OS specific libraries their documentation is the next:
+
+- [unix.md: Unix specific library documentation](doc/os/unix.md)
+- [windows.md: Windows specific library documentation](doc/os/windows.md)
+
 
 
 ### License

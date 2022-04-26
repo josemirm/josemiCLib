@@ -1,3 +1,4 @@
+// winfifo.c
 // José Miguel Rodríguez Marchena (@josemirm)
 
 #include "winfifo.h"
@@ -64,15 +65,15 @@
 			printErrorFileLine("createWinFifo: name is NULL");
 			return NULL;
 		}
-		
+
 		HANDLE ret = CreateNamedPipeA(
 			name,
 			direction | FILE_FLAG_FIRST_PIPE_INSTANCE,
 			type | readMode | waitMode,
 			PIPE_UNLIMITED_INSTANCES,
-			FIFO_BUFFER_SIZE,
-			FIFO_BUFFER_SIZE,
-			FIFO_TIMEOUT_MS,
+			WINFIFO_BUFFER_SIZE,
+			WINFIFO_BUFFER_SIZE,
+			WINFIFO_TIMEOUT_MS,
 			NULL
 		);
 
@@ -80,6 +81,8 @@
 			printWinError("createWinFifo: CreateNamedPipeA failed");
 			return NULL;
 		}
+
+		ConnectNamedPipe(ret, NULL);
 
 		return ret;
     }
@@ -123,22 +126,27 @@
 		}
 	}
 
-	HANDLE openWinFifo(char const *name, const bool readOnly) {
+	HANDLE openWinFifo(char const *name, enum WinFifoDirection dir) {
 		if (NULL == name) {
 			printErrorFileLine("openWinFifo: name is NULL");
 			return NULL;
 		}
 
 		// Waits to other process to create the pipe
-		if (0 == WaitNamedPipeA(name, FIFO_TIMEOUT_MS)) {
+		if (0 == WaitNamedPipeA(name, NMPWAIT_WAIT_FOREVER)) {
 			printWinError("openWinFifo: Error waiting the named pipe");
 			return NULL;
 		}
-		
+
+		// In case of FIFO read...
 		DWORD access = GENERIC_READ;
 		DWORD shareMode = FILE_SHARE_READ;
 
-		if (!readOnly) {
+		// Otherwise...
+		if (FIFO_OUT_ONLY == dir) {
+			access = GENERIC_WRITE;
+			shareMode = FILE_SHARE_WRITE;
+		} else if (FIFO_IN_OUT == dir) {
 			access |= GENERIC_WRITE;
 			shareMode |= FILE_SHARE_WRITE;
 		}
@@ -163,11 +171,11 @@
 			printError("readWinFifo: fifo is NULL");
 			return -1;
 		}
-		
+
 		if (NULL == buffer) {
 			printError("readWinFifo: buffer is NULL");
 			return -1;
-		}	
+		}
 
 		DWORD bytesRead = 0;
 		BOOL ret = FALSE;
@@ -175,10 +183,11 @@
 		do {
 			ret = ReadFile(fifo, buffer, (DWORD) bufferSize, &bytesRead, NULL);
 		} while (FALSE == ret && FIFO_TYPE_BYTE == dataType && ERROR_MORE_DATA == GetLastError());
-		
+
 
 		if (0 == ret && !(ERROR_MORE_DATA == GetLastError())) {
-			printWinError("readWinFifo: Error reading the FIFO");
+			//printWinError("readWinFifo: Error reading the FIFO");
+			// The error message is omitted because the error would be shown when the FIFO is closed
 			return -1;
 		}
 
@@ -194,11 +203,11 @@
 			printError("writeWinFifo: fifo is NULL");
 			return -1;
 		}
-		
+
 		if (NULL == buffer) {
 			printError("writeWinFifo: buffer is NULL");
 			return -1;
-		}	
+		}
 
 		DWORD bytesWritten = 0;
 
@@ -208,7 +217,10 @@
 
 			bytesWritten += loopBytesWritten;
 
-			if (0 == ret && !(ERROR_IO_PENDING == GetLastError())) {
+			// This is for debugging purposes
+			DWORD lastError = GetLastError();
+
+			if (0 == ret && !(ERROR_IO_PENDING == lastError)) {
 				printWinError("writeWinFifo: Error writing the FIFO");
 				return -1;
 			}

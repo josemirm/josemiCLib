@@ -1,3 +1,4 @@
+// utils.c
 // José Miguel Rodríguez Marchena (@josemirm)
 
 #include "utils.h"
@@ -6,7 +7,7 @@ char* newString(char const *value, const size_t size) {
 	if (size < 1 || value == NULL) {
 		return NULL;
 	}
-	
+
 	char *ret = (char*) malloc(sizeof(char)*(size + 1));
 	if (ret == NULL) {
 		return NULL;
@@ -21,18 +22,18 @@ char* newString(char const *value, const size_t size) {
 // It could have used "strdup", but it's deprecated in Windows (even if it's correct
 // in POSIX OSes), so this prevent a future dependency problem.
 char *duplicateString(char const *str) {
-    if (NULL == str) {
-        return NULL;
-    }
+	if (NULL == str) {
+		return NULL;
+	}
 
-    size_t size = strlen(str) + 1;
-    char* ret = (char*) malloc(size);
+	size_t size = strlen(str) + 1;
+	char* ret = (char*) malloc(size);
 	if (NULL == ret) {
 		return NULL;
 	}
 
-    memcpy(ret, str, size);
-    return ret;
+	memcpy(ret, str, size);
+	return ret;
 }
 
 

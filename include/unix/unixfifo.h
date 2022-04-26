@@ -1,18 +1,16 @@
+// unixfifo.h
 // José Miguel Rodríguez Marchena (@josemirm)
 
 #pragma once
 
 #include "../utils.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 #ifdef __UNIX_PLATFORM__
 	#include "unixutils.h"
-
 	#include <stdbool.h>
 	#include <sys/types.h>
 	#include <sys/stat.h>

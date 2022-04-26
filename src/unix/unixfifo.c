@@ -1,138 +1,140 @@
-#include "unixfifo.h"
+// unixfifo.c
+// José Miguel Rodríguez Marchena (@josemirm)
 
+#include "../../include/unix/unixfifo.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-    #ifdef __UNIX_PLATFORM__
+	#ifdef __UNIX_PLATFORM__
 
-    int createUnixFifo(const char *fname) {
-        if (NULL == fname) {
-            printError("createUnixFifo: fname is NULL");
-            return -1;
-        }
-        
-        const int fileMask = 0660;
-        int ret = mkfifo(fname, fileMask);
+	int createUnixFifo(const char *fname) {
+		if (NULL == fname) {
+			printError("createUnixFifo: fname is NULL");
+			return -1;
+		}
 
-        if (-1 == ret) {
-            if (EEXIST == errno) {
-                fprintf(stderr, "File '%s' already exists\n", fname);
-            } else {
-                perror("Error creating the FIFO");
-            }
-        }
+		const int fileMask = 0660;
+		int ret = mkfifo(fname, fileMask);
 
-        return ret;
-    }
+		if (-1 == ret) {
+			if (EEXIST == errno) {
+				fprintf(stderr, "File '%s' already exists\n", fname);
+			} else {
+				perror("Error creating the FIFO");
+			}
+		}
 
-
-    int openUnixFifo(const char *fname, const bool readOnly) {
-        if (NULL == fname) {
-            printErrorFileLine("openUnixFifo: fname is NULL");
-            return -1;
-        }
-        
-        int ret = -1;
-        int mode = O_RDWR;
-
-        if (readOnly) {
-            mode = O_RDONLY;
-        }
-
-        ret = open(fname, mode);
-
-        if (-1 == ret) {
-            perror("Error opening the FIFO");
-        }
-
-        return ret;
-    }
+		return ret;
+	}
 
 
-    void closeUnixFifo(const int fd) {
-        if (0 > fd) {
-            printError("closeUnixFifo: Invalid file descriptor");
-            return;
-        }
+	int openUnixFifo(const char *fname, const bool readOnly) {
+		if (NULL == fname) {
+			printErrorFileLine("openUnixFifo: fname is NULL");
+			return -1;
+		}
 
-        close(fd);
-    }
+		int ret = -1;
+		int mode = O_RDWR;
 
+		if (readOnly) {
+			mode = O_RDONLY;
+		}
 
-    void destroyUnixFifo(char const* fname, const int fd) {
-        if (0 > fd) {
-            printError("destroyUnixFifo: Invalid file descriptor");
-            return;
-        }
+		ret = open(fname, mode);
 
-        if (NULL == fname) {
-            printError("destroyUnixFifo: Invalid file name");
-            return;
-        }
+		if (-1 == ret) {
+			perror("Error opening the FIFO");
+		}
 
-        if (-1 == close(fd)) {
-            perror("destroyUnixFifo: Error closing the FIFO");
-        }
-
-        if (-1 == unlink(fname)) {
-            perror("destroyUnixFifo: Error unlinking the FIFO");
-        }
-    }
+		return ret;
+	}
 
 
-    int readUnixFifo(const int fd, char *buf, const size_t size, const bool isByteOriented) {
-        if (0 > fd) {
-            printError("readUnixFifo: fd is invalid");
-            return -1;
-        }
+	void closeUnixFifo(const int fd) {
+		if (0 > fd) {
+			printError("closeUnixFifo: Invalid file descriptor");
+			return;
+		}
 
-        if (NULL == data) {
-            printError("readUnixFifo: data is NULL");
-            return -1;
-        }
-        
-        unsigned int bytesRead = 0;
-        if (isByteOriented) {
-            bytesRead = read_n(fd, buf, size);
-        } else {
-            bytesRead = read(fd, buf, size);
-
-            if (bytesRead < 0) {
-                perror("Error reading from the FIFO");
-                return -1;
-            }
-        }
-
-        return bytesRead;
-    }
+		close(fd);
+	}
 
 
-    int writeUnixFifo(const int fd, char const *data, const size_t size) {
-        if (0 > fd) {
-            printError("writeUnixFifo: fd is invalid");
-            return -1;
-        }
+	void destroyUnixFifo(char const* fname, const int fd) {
+		if (0 > fd) {
+			printError("destroyUnixFifo: Invalid file descriptor");
+			return;
+		}
 
-        if (NULL == data) {
-            printError("writeUnixFifo: data is NULL");
-            return -1;
-        }
-        
-        unsigned int bytesWritten = 0;
-        bytesWritten = write_n(fd, data, size);
+		if (NULL == fname) {
+			printError("destroyUnixFifo: Invalid file name");
+			return;
+		}
 
-        if (bytesWritten < 0) {
-            perror("Error writing to the FIFO");
-        }
+		if (-1 == close(fd)) {
+			perror("destroyUnixFifo: Error closing the FIFO");
+		}
 
-        return bytesWritten;
-    }
+		if (-1 == unlink(fname)) {
+			perror("destroyUnixFifo: Error unlinking the FIFO");
+		}
+	}
 
 
-    #endif
+	int readUnixFifo(const int fd, char *buf, const unsigned int size, const bool isByteOriented) {
+		if (0 > fd) {
+			printError("readUnixFifo: fd is invalid");
+			return -1;
+		}
+
+		if (NULL == buf) {
+			printError("readUnixFifo: buffer is NULL");
+			return -1;
+		}
+
+		ssize_t bytesRead = 0;
+		if (isByteOriented) {
+			bytesRead = read_n(fd, buf, size);
+		} else {
+			bytesRead = read(fd, buf, size);
+
+			if (0 > bytesRead) {
+				perror("Error reading from the FIFO");
+				return -1;
+			}
+		}
+
+		return bytesRead;
+	}
+
+
+	int writeUnixFifo(const int fd, char const *data, const unsigned int size) {
+		if (0 > fd) {
+			printError("writeUnixFifo: fd is invalid");
+			return -1;
+		}
+
+		if (NULL == data) {
+			printError("writeUnixFifo: data is NULL");
+			return -1;
+		}
+
+		ssize_t bytesWritten = 0;
+		bytesWritten = write_n(fd, data, size);
+
+		if (0 > bytesWritten) {
+			perror("Error writing to the FIFO");
+		}
+
+		return bytesWritten;
+	}
+
+
+	#endif
 
 
 #ifdef __cplusplus

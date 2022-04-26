@@ -1,3 +1,4 @@
+// winfifo.h
 // José Miguel Rodríguez Marchena (@josemirm)
 
 #pragma once
@@ -14,8 +15,10 @@ extern "C" {
         #include "winutils.h"
         #include <Windows.h>
         
-        #define FIFO_BUFFER_SIZE 128
-        #define FIFO_TIMEOUT_MS 1000
+
+        #define WINFIFO_BUFFER_SIZE 128
+        #define WINFIFO_TIMEOUT_MS 1000
+
 
         enum WinFifoDirection {
             FIFO_OUT_ONLY = PIPE_ACCESS_OUTBOUND,
@@ -38,6 +41,7 @@ extern "C" {
             FIFO_NOWAIT = PIPE_NOWAIT
         };
 
+
         bool isValidWinFifoName(char const *name);
         char *newWinFifoName(char const *name);
 
@@ -55,7 +59,6 @@ extern "C" {
             const enum WinFifoDataType dataType);
         int writeWinFifo(const HANDLE fifo, char const *buffer, const size_t bufferSize);
 
-        typedef HANDLE FifoHandle;
 
     #endif
 

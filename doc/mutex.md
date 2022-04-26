@@ -33,6 +33,29 @@ Example of `createMutex()` and `destroyMutex()`:
 	destroyMutex(&mtx);
 ```
 
+
+Example of mutex usage with `lockMutex()` and `unlockMutex()` with a thread function:
+```c
+void* threadFunction(void* args) {
+	// Global mutex created previously
+	if (lockMutex(mtx)) {
+		fprintf(stderr, "Error locking mutex\n");
+		return NULL;
+	}
+
+	// If there are multiple threads running this function, the process done up
+	// next would be execute only in one thread, stopping the rest of the
+	// threads from accessing the same shared space.
+	doSomeProcess(&someSharedSpace);
+
+	if (unlockMutex(mtx)) {
+		fprintf(stderr, "Error unlocking mutex\n");
+	}
+
+	return NULL;
+}
+```
+
 ---
 
 ### Functions
