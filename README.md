@@ -3,6 +3,9 @@
 A basic C library with very used common functions and wrappers to use common OS functionalities.
 The wrappers are OS agnostic between Unix and Windows, and they use OS specific system calls or APIs to achieve that.
 
+### Download
+You can download this library using any git client, pressing the button 'Code' and 'Download ZIP', or using [this link](https://github.com/josemirm/josemiCLib/archive/refs/heads/main.zip)
+
 ### Usage
 
 This library can be used including the `include` and `src` folders in your project and compiling all together.
